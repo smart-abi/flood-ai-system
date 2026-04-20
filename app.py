@@ -85,14 +85,22 @@ map_type = st.radio("Map View", ["Heatmap", "Points"])
 # -----------------------------
 # CREATE MAP
 # -----------------------------
+# -----------------------------
+# CREATE MAP
+# -----------------------------
 m = folium.Map(
     location=[filtered["lat"].mean(), filtered["lon"].mean()],
     zoom_start=7
 )
 
+# REMOVE NaN values before plotting
+filtered = filtered.dropna(subset=["lat", "lon", "Flood_Prob"])
+
 if map_type == "Heatmap":
-    heat_data = [[row["lat"], row["lon"], float(row["Flood_Prob"])]
-                 for _, row in filtered.iterrows()]
+    heat_data = [
+        [row["lat"], row["lon"], float(row["Flood_Prob"])]
+        for _, row in filtered.iterrows()
+    ]
     HeatMap(heat_data).add_to(m)
 else:
     for _, row in filtered.iterrows():

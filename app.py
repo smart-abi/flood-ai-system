@@ -5,7 +5,6 @@ import json
 import folium
 from folium.plugins import HeatMap
 from streamlit_folium import st_folium
-from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 
 # -----------------------------
@@ -19,7 +18,7 @@ st.markdown("### Real-time Prediction • Geo Mapping • Smart Alerts")
 # -----------------------------
 # LOAD MODEL + DATA
 # -----------------------------
-model = load_model("flood_lstm_model.h5")
+
 data = pd.read_csv("combined_flood_data.csv")
 
 # -----------------------------
@@ -58,16 +57,25 @@ filtered["Rainfall"] = filtered["Rainfall"] + live_rainfall
 # -----------------------------
 # MODEL PREDICTION
 # -----------------------------
-features = ['Blue', 'Green', 'Red', 'NDWI', 'Rainfall', 'Elevation', 'Slope', 'VH', 'VV']
+# -----------------------------
+# AI PREDICTION (SIMULATION MODE)
+# -----------------------------
+np.random.seed(42)  # for consistent output
 
-X = filtered[features].values
-X = np.repeat(X, 3, axis=0)
-X = X.reshape(-1, 3, len(features))
+filtered["Flood_Prob"] = (
+    0.4 * (filtered["Rainfall"] / filtered["Rainfall"].max()) +
+    0.3 * filtered["NDWI"] +
+    0.2 * (1 / (filtered["Elevation"] + 1)) +
+    0.1 * np.random.rand(len(filtered))
+)
 
-preds = model.predict(X)
+# Normalize between 0 and 1
+filtered["Flood_Prob"] = (
+    (filtered["Flood_Prob"] - filtered["Flood_Prob"].min()) /
+    (filtered["Flood_Prob"].max() - filtered["Flood_Prob"].min())
+)
 
-filtered["Flood_Prob"] = preds
-filtered["Flood"] = (preds > 0.5).astype(int)
+filtered["Flood"] = (filtered["Flood_Prob"] > 0.5).astype(int)
 
 # -----------------------------
 # MAP TYPE

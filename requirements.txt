@@ -2,6 +2,6 @@ streamlit
 pandas
 numpy
 matplotlib
-folium==0.14.0
-streamlit-folium==0.15.0
-tensorflow-cpu
+folium
+streamlit-folium
+h5py

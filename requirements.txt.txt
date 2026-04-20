@@ -1,7 +1,8 @@
-streamlit
+streamlit==1.32.0
 pandas
 numpy
 matplotlib
-folium==0.14.0
-streamlit-folium==0.15.0
-tensorflow-cpu
+folium
+streamlit-folium
+tensorflow-cpu==2.15.0
+branca
